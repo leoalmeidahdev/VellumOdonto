@@ -1,0 +1,656 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  :root {
+    --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-curtain: cubic-bezier(0.76, 0, 0.24, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --page: #f7f1e8;
+  }
+
+  /* O fundo da página muda de cor conforme a seção que está no centro da tela
+     (ver useThemeSections). A transição longa é o que dá a sensação de um
+     único site contínuo, em vez de blocos empilhados. */
+  html[data-theme='ink'] {
+    --page: #1c1b1a;
+  }
+
+  html,
+  body,
+  #root {
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    /* A rolagem suave é feita em JS (lib/smoothScroll); o CSS precisa ficar em auto. */
+    scroll-behavior: auto;
+    scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: 'Open Sauce One', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+    background-color: var(--page);
+    color: #1c1b1a;
+    transition: background-color 0.9s var(--ease-expo);
+  }
+
+  /* Open Sauce One vem em duas famílias separadas (Regular e Bold). */
+  .font-semibold,
+  .font-bold,
+  .font-extrabold {
+    font-family: 'Open Sauce One Bold', 'Open Sauce One', -apple-system, sans-serif;
+  }
+
+  ::selection {
+    background: #1c1b1a;
+    color: #f7f1e8;
+  }
+
+  :focus-visible {
+    outline: 2px solid #d2553f;
+    outline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* ==========================================================================
+   Navbar sobre seções escuras
+   ========================================================================== */
+
+.nav-shell {
+  transition:
+    transform 0.6s var(--ease-expo),
+    background-color 0.9s var(--ease-expo),
+    color 0.9s var(--ease-expo);
+}
+html[data-theme='ink'] .nav-shell {
+  background-color: rgb(28 27 26 / 0.72);
+  color: #f7f1e8;
+}
+html[data-theme='ink'] .nav-shell .nav-btn-outline {
+  border-color: #f7f1e8;
+  background-color: transparent;
+  color: #f7f1e8;
+}
+html[data-theme='ink'] .nav-shell .nav-btn-outline:hover {
+  background-color: #f7f1e8;
+  color: #1c1b1a;
+}
+html[data-theme='ink'] .nav-shell .nav-btn-solid {
+  background-color: #f7f1e8;
+  color: #1c1b1a;
+}
+html[data-theme='ink'] .nav-shell .nav-burger span {
+  background-color: #f7f1e8;
+}
+
+/* ==========================================================================
+   Biblioteca de movimento (cores e intensidades ajustadas para a paleta Vellum)
+   ========================================================================== */
+
+/* 01 Aparecer · 02 Subir e aparecer · 04 Entrar crescendo · 06 Deslizar da
+   lateral · 26 Desfoque que resolve
+   Qualquer elemento com data-reveal começa escondido e anima quando recebe
+   .is-in (useReveal / <Reveal>) — ou quando o pai direto recebe .is-in, para
+   revelar um grupo de uma vez. --d controla o atraso (cascata, 05). */
+[data-reveal] {
+  transition:
+    opacity 0.8s var(--ease-expo) var(--d, 0ms),
+    transform 0.9s var(--ease-expo) var(--d, 0ms),
+    filter 0.9s var(--ease-expo) var(--d, 0ms),
+    clip-path 1.1s var(--ease-curtain) var(--d, 0ms);
+}
+[data-reveal='fade']:not(.is-in, .is-in > *) {
+  opacity: 0;
+}
+[data-reveal='up']:not(.is-in, .is-in > *) {
+  opacity: 0;
+  transform: translateY(26px);
+}
+[data-reveal='blur']:not(.is-in, .is-in > *) {
+  opacity: 0;
+  filter: blur(14px);
+  transform: translateY(12px) scale(0.985);
+}
+[data-reveal='pop'] {
+  transition-timing-function: var(--ease-spring);
+  transition-duration: 0.55s;
+}
+[data-reveal='pop']:not(.is-in, .is-in > *) {
+  opacity: 0;
+  transform: scale(0.6);
+}
+[data-reveal='slide-l']:not(.is-in, .is-in > *) {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+[data-reveal='slide-r']:not(.is-in, .is-in > *) {
+  opacity: 0;
+  transform: translateX(40px);
+}
+[data-reveal='clip']:not(.is-in, .is-in > *) {
+  clip-path: inset(100% 0 0 0 round 16px);
+}
+[data-reveal='clip'] {
+  clip-path: inset(0 0 0 0 round 16px);
+}
+
+/* 03 Elevar no hover */
+.fx-lift {
+  transition:
+    transform 0.35s var(--ease-expo),
+    box-shadow 0.35s var(--ease-expo);
+}
+@media (hover: hover) {
+  .fx-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 48px -24px rgb(28 27 26 / 0.45);
+  }
+}
+
+/* 07 Pulsar */
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgb(210 85 63 / 0.45);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 8px rgb(210 85 63 / 0);
+  }
+}
+.fx-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* 08 Girar */
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fx-spin {
+  animation: spin 18s linear infinite;
+}
+
+/* 09 Sublinhado */
+.fx-underline {
+  position: relative;
+}
+.fx-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.45s var(--ease-expo);
+}
+.fx-underline:hover::after,
+.fx-underline:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* 10 Brilho que atravessa */
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  28%,
+  100% {
+    left: 200%;
+  }
+}
+.fx-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.fx-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 55%;
+  height: 100%;
+  pointer-events: none;
+  transform: skew(-25deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.08) 40%,
+    rgb(255 255 255 / 0.38) 50%,
+    rgb(255 255 255 / 0.08) 60%,
+    transparent
+  );
+  animation: shine 3.6s ease-in-out infinite;
+}
+
+/* 11 Barra de progresso */
+@keyframes barfill {
+  100% {
+    transform: scaleX(var(--to, 0.7));
+  }
+}
+.fx-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.is-in .fx-bar > span,
+.fx-bar.is-in > span {
+  animation: barfill 1.6s var(--ease-expo) calc(var(--d, 0ms) + 200ms) forwards;
+}
+
+/* 12 Sanfona */
+.fx-acc-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.55s var(--ease-expo);
+}
+.fx-acc-body > div {
+  overflow: hidden;
+}
+.fx-acc[data-open='true'] .fx-acc-body {
+  grid-template-rows: 1fr;
+}
+.fx-acc-sign {
+  transition: transform 0.45s var(--ease-expo);
+}
+.fx-acc[data-open='true'] .fx-acc-sign {
+  transform: rotate(45deg);
+}
+
+/* 13 Flutuar */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(var(--float, -12px));
+  }
+}
+.fx-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* 14 Respirar */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 44px 6px rgb(247 241 232 / 0.1);
+  }
+  50% {
+    transform: scale(1.035);
+    box-shadow: 0 0 66px 14px rgb(247 241 232 / 0.22);
+  }
+}
+.fx-breathe {
+  animation: breathe 4.5s ease-in-out infinite;
+}
+
+/* 15 Esqueleto */
+@keyframes skel {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+.fx-skel {
+  background: linear-gradient(90deg, #efe8dd 25%, #faf6f0 37%, #efe8dd 63%) 0 0 / 400% 100%;
+  animation: skel 1.4s ease-in-out infinite;
+}
+
+/* 16 Quicar */
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  22% {
+    transform: translateY(-10px);
+  }
+  40% {
+    transform: translateY(0);
+  }
+  54% {
+    transform: translateY(-5px);
+  }
+  68% {
+    transform: translateY(0);
+  }
+  78% {
+    transform: translateY(-2px);
+  }
+  88%,
+  100% {
+    transform: translateY(0);
+  }
+}
+.fx-bounce {
+  animation: bounce 1.8s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
+}
+.fx-bounce-hover {
+  display: inline-block;
+}
+@media (hover: hover) {
+  .group:hover .fx-bounce-hover {
+    animation: bounce 1.8s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
+  }
+}
+
+/* 17 Esteira infinita */
+@keyframes marquee {
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.fx-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--dur, 60s) linear infinite;
+}
+.fx-marquee.is-reverse {
+  animation-direction: reverse;
+}
+.fx-marquee-wrap:hover .fx-marquee {
+  animation-play-state: paused;
+}
+
+/* 19 Máquina de escrever (cursor) */
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+.fx-caret {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.9em;
+  margin-left: 0.06em;
+  vertical-align: -0.06em;
+  background: currentColor;
+  animation: caret 0.8s step-end infinite;
+}
+
+/* 20 Gradiente vivo */
+@keyframes grad {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.fx-grad {
+  background: linear-gradient(120deg, #1c1b1a, #2f2c29, #4a4741, #2f2c29, #1c1b1a) 0 0 / 300% 300%;
+  animation: grad 14s ease infinite;
+}
+.fx-grad-light {
+  background: linear-gradient(120deg, #f7f1e8, #ece4d8, #fbf8f3, #e6dccd, #f7f1e8) 0 0 / 300% 300%;
+  animation: grad 16s ease infinite;
+}
+
+/* 21 Cortina */
+@keyframes curtain {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+  50.1% {
+    transform: scaleX(1);
+    transform-origin: right center;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right center;
+  }
+}
+@keyframes curtainTxt {
+  100% {
+    opacity: 1;
+  }
+}
+.fx-curtain {
+  position: relative;
+  display: inline-block;
+}
+.fx-curtain > span {
+  opacity: 0;
+}
+.fx-curtain::after {
+  content: '';
+  position: absolute;
+  inset: 0.06em -0.04em 0.02em;
+  background: #1c1b1a;
+  border-radius: 4px;
+  transform: scaleX(0);
+}
+.fx-curtain.is-in::after,
+.is-in .fx-curtain::after {
+  animation: curtain 1.1s var(--ease-curtain) var(--d, 0ms) forwards;
+}
+.fx-curtain.is-in > span,
+.is-in .fx-curtain > span {
+  animation: curtainTxt 0.01s linear calc(var(--d, 0ms) + 550ms) forwards;
+}
+
+/* 22 Traço que se desenha (os paths usam pathLength="1") */
+@keyframes draw {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+.fx-draw path,
+.fx-draw circle,
+.fx-draw line,
+.fx-draw polyline,
+.fx-draw rect,
+.fx-draw ellipse {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.is-in .fx-draw path,
+.is-in .fx-draw circle,
+.is-in .fx-draw line,
+.is-in .fx-draw polyline,
+.is-in .fx-draw rect,
+.is-in .fx-draw ellipse,
+.fx-draw.is-in path,
+.fx-draw.is-in circle,
+.fx-draw.is-in line,
+.fx-draw.is-in polyline,
+.fx-draw.is-in rect,
+.fx-draw.is-in ellipse {
+  animation: draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) calc(var(--d, 0ms) + var(--i, 0) * 140ms) forwards;
+}
+
+/* 23 Card que vira */
+.fx-flip {
+  perspective: 1200px;
+}
+.fx-flip-faces {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.8s var(--ease-expo);
+}
+.fx-flip[data-flipped='true'] .fx-flip-faces {
+  transform: rotateY(180deg);
+}
+@media (hover: hover) {
+  .fx-flip:hover .fx-flip-faces {
+    transform: rotateY(180deg);
+  }
+}
+.fx-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.fx-face-back {
+  transform: rotateY(180deg);
+}
+
+/* 24 Inclinar em 3D */
+.fx-tilt {
+  transition: transform 0.25s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* 25 Onda no clique */
+@keyframes ripple {
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+.fx-ripple-wave {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: currentColor;
+  opacity: 0.22;
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple 0.7s var(--ease-expo) forwards;
+}
+
+/* 27 Texto em onda */
+@keyframes wave {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-0.14em);
+  }
+}
+.fx-wave > span {
+  display: inline-block;
+  animation: wave 1.8s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+.fx-wave-hover > span {
+  display: inline-block;
+}
+@media (hover: hover) {
+  .fx-wave-hover:hover > span {
+    animation: wave 1.1s ease-in-out;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+}
+
+/* 28 Forma que muda */
+@keyframes blob {
+  0%,
+  100% {
+    border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
+    transform: rotate(0deg);
+  }
+  34% {
+    border-radius: 62% 38% 34% 66% / 58% 62% 38% 42%;
+    transform: rotate(6deg);
+  }
+  67% {
+    border-radius: 44% 56% 61% 39% / 36% 51% 49% 64%;
+    transform: rotate(-4deg);
+  }
+}
+.fx-blob {
+  border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
+  animation: blob 10s ease-in-out infinite;
+}
+
+/* 30 Ímã no cursor */
+.fx-magnet {
+  transition: transform 0.35s var(--ease-expo);
+  will-change: transform;
+}
+
+/* Revelação palavra por palavra amarrada à rolagem (Manifesto).
+   --p vai de 0 a 1 conforme a seção atravessa a tela. */
+.scrub-word {
+  opacity: clamp(0.14, calc(var(--p, 0) * var(--n, 1) * 1.15 - var(--i, 0)), 1);
+  transition: opacity 0.12s linear;
+}
+
+/* ==========================================================================
+   Acessibilidade: quem prefere menos movimento vê tudo parado e completo.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+  }
+  .fx-draw path,
+  .fx-draw circle,
+  .fx-draw line,
+  .fx-draw polyline,
+  .fx-draw rect,
+  .fx-draw ellipse {
+    stroke-dashoffset: 0 !important;
+  }
+  .fx-curtain > span {
+    opacity: 1 !important;
+  }
+  .fx-marquee {
+    animation: none !important;
+  }
+  .scrub-word {
+    opacity: 1 !important;
+  }
+}
